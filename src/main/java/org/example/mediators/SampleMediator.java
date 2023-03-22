@@ -9,16 +9,18 @@ import org.apache.axiom.om.OMElement;
 import javax.xml.namespace.QName;
 
 
-public class XMLElementRemoveMediator extends AbstractMediator{
-
+public class SampleMediator extends AbstractMediator{
     private String removeElementName;
 
     @Override
     public boolean mediate(MessageContext mc) {
+
+        boolean result = false;
+
         SynapseLog synLog = getLog(mc);
 
         if (synLog.isTraceOrDebugEnabled()) {
-            synLog.traceOrDebug("Start : XMLElementRemove mediator");
+            synLog.traceOrDebug("Start : Sample Mediator");
             if (synLog.isTraceTraceEnabled()) {
                 synLog.traceTrace("Message : " + mc.getEnvelope());
             }
@@ -28,32 +30,32 @@ public class XMLElementRemoveMediator extends AbstractMediator{
             org.apache.axis2.context.MessageContext axis2MsgContext = ((Axis2MessageContext) mc)
                     .getAxis2MessageContext();
 
-            // OMElement payload = axis2MsgContext.getEnvelope().getBody().getFirstElement();
-            //  synLog.traceOrDebug("Payload : " + payload.toString());
-
-            // Find the reqMsg element and remove it
+            // Find the reqMsg element
             QName elementNS = new QName("", removeElementName);
             OMElement reqMsg = axis2MsgContext.getEnvelope().getBody().getFirstElement().getFirstChildWithName(elementNS);
-            // OMElement reqMsg = payload.getFirstChildWithName(new javax.xml.namespace.QName("", "reqMsg"));
-            synLog.traceOrDebug("Removing Element : " + reqMsg.toString());
 
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Removing Element : " + reqMsg.toString());
+            }
+
+            // Remove reqMsg element from the context
             if (reqMsg != null) {
                 reqMsg.detach();
-                // synLog.traceOrDebug("Modified Payload : " + payload.toString());
             }
 
             // Set the modified payload back to the message context
             // axis2MsgContext.getEnvelope().getBody().addChild(payload);
+            result = true;
         } catch (Exception e) {
             log.error("Error: " + e.getMessage(), e);
-            return false;
+            result = false;
         }
-
 
         if (synLog.isTraceOrDebugEnabled()) {
-            synLog.traceOrDebug("End : XMLElementRemove mediator");
+            synLog.traceOrDebug("End : Sample Mediator");
         }
-        return true;
+
+        return result;
     }
 
     public String getRemoveElementName() {
@@ -67,5 +69,4 @@ public class XMLElementRemoveMediator extends AbstractMediator{
     public String getType() {
         return null;
     }
-
 }
